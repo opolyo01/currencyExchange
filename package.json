@@ -1,0 +1,22 @@
+{
+  "name": "currencyExchange",
+  "version": "0.0.0",
+  "description": "Converts from base currency (usd) by default to other currencies",
+  "main": "index.js",
+  "scripts": {
+    "test": "test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/opolyo01/currencyExchange.git"
+  },
+  "keywords": [
+    "currencyExchange"
+  ],
+  "author": "Oleg Polyakov <opolyo01@yahoo.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/opolyo01/currencyExchange/issues"
+  },
+  "homepage": "https://github.com/opolyo01/currencyExchange"
+}
