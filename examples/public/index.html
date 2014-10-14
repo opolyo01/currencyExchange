@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <title>Transaction History</title>
+  <style>
+        h1{color:#5D95CC;}
+        body{margin: 20px 200px;font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;}
+        table{border-collapse: collapse;width: 800px;}
+        tr {display: table-row;vertical-align: inherit;border-color: inherit;background-color: #F1F1F1;}
+        tr.even{background-color: #D5D5D5;}
+        td{font-size: 1.2em;border: 1px solid #eee;padding: 3px 7px 2px 7px;height: 50px;}
+    </style>
+</head>
+<body>
+  <h1>Transaction History</h1>
+  <div id="transaction_history">
+  </div>
+
+<script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+<script src="../js/react/react.min.js"></script>
+<script src="../js/react/JSXTransformer.js"></script>
+
+<script type="text/jsx">
+    /** @jsx React.DOM */
+    'use strict';
+
+    var TransactionHistory = React.createClass({
+        render: function(){
+            var transactions = this.props.transactions.map(function(transaction, idx){
+                var trClass = idx % 2 ? "even" : "";
+                return(
+                    <tr className={trClass}>
+                        <td>{transaction.date}</td>
+                        <td>{transaction.title}</td>
+                        <td>{transaction.symbol} {transaction.price}</td>
+                    </tr>
+                );
+            });
+            return(
+                <table className="transactions-container">
+                    {transactions}
+                </table>
+            );
+        }
+    });
+
+    
+
+    $.get("/paypal/transactionHistory").then(function(resp){
+        React.renderComponent(
+              <TransactionHistory transactions={resp} />,
+              document.querySelector('#transaction_history')
+        );
+    });
+</script>
+</body>
+</html>

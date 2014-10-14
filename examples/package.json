@@ -2,6 +2,7 @@
   "name": "rateConversion",
   "main": "server.js",
   "dependencies": {
+    "compression": "^1.1.1",
     "express": "~4.1.1"
   }
 }
