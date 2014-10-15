@@ -23,18 +23,48 @@
 <script type="text/jsx">
     /** @jsx React.DOM */
     'use strict';
+    var Combo = React.createClass({
+
+        render: function(){
+            var symbols = this.props.symbols.map(function(symbol, idx){
+                return <option value={symbol.symbol}>{symbol.symbol} {symbol.symbolSign}</option>;
+            });
+            return (
+                <select onChange={this.props.changeSelect}>
+                  {symbols}
+                </select>
+            );
+        }
+    });
+
+    var Transaction = React.createClass({
+
+        changeSelect: function(e){
+            console.log(e.target.value, e.target);
+            //Why wouldn't it re-render?
+            this.props.transaction.title = "oleg";
+        },
+
+        render: function(){
+            return(
+                <tr className={this.props.trClass}>
+                    <td>{this.props.transaction.date}</td>
+                    <td>{this.props.transaction.title}</td>
+                    <td>
+                        <Combo symbols={this.props.symbols} changeSelect={this.changeSelect}/>
+                    </td>
+                    <td>{this.props.transaction.symbol} {this.props.transaction.price}</td>
+                </tr>
+            );
+        }
+    });
 
     var TransactionHistory = React.createClass({
         render: function(){
+            var self = this;
             var transactions = this.props.transactions.map(function(transaction, idx){
                 var trClass = idx % 2 ? "even" : "";
-                return(
-                    <tr className={trClass}>
-                        <td>{transaction.date}</td>
-                        <td>{transaction.title}</td>
-                        <td>{transaction.symbol} {transaction.price}</td>
-                    </tr>
-                );
+                return <Transaction transaction={transaction} trClass={trClass} symbols={self.props.symbols} />;
             });
             return(
                 <table className="transactions-container">
@@ -44,11 +74,9 @@
         }
     });
 
-    
-
-    $.get("/paypal/transactionHistory").then(function(resp){
+    $.when( $.get("/paypal/transactionHistory"), $.get("/paypal/symbols") ).done(function( transactions, symbols ) {
         React.renderComponent(
-              <TransactionHistory transactions={resp} />,
+              <TransactionHistory transactions={transactions[0]} symbols={symbols[0]} />,
               document.querySelector('#transaction_history')
         );
     });
