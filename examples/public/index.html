@@ -19,18 +19,32 @@
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="../js/react/react.min.js"></script>
 <script src="../js/react/JSXTransformer.js"></script>
+<script src="../js/underscore.js"></script>
 
 <script type="text/jsx">
     /** @jsx React.DOM */
     'use strict';
+    
     var Combo = React.createClass({
-
+        
+        componentWillMount: function() {
+            this.setState({
+              symbol: "USD"
+            });
+        },
+        changeSelect: function(e){
+            var symbol = e.target.value;
+            this.setState({
+                symbol: symbol
+            });
+            this.props.changeSelect(symbol);
+        },
         render: function(){
             var symbols = this.props.symbols.map(function(symbol, idx){
                 return <option value={symbol.symbol}>{symbol.symbol} {symbol.symbolSign}</option>;
             });
             return (
-                <select onChange={this.props.changeSelect}>
+                <select onChange={this.changeSelect} value={this.state.symbol}>
                   {symbols}
                 </select>
             );
@@ -39,10 +53,29 @@
 
     var Transaction = React.createClass({
 
-        changeSelect: function(e){
-            console.log(e.target.value, e.target);
-            //Why wouldn't it re-render?
-            this.props.transaction.title = "oleg";
+        changeSelect: function(symbol){
+            var rate = _.find(this.props.symbols, function(cur){
+                return cur.symbol === symbol;
+            });
+
+            this.setState({
+                symbolSign: rate.symbolSign,
+                price: (rate.amount * this.props.transaction.price).toFixed(2)
+            });
+        },
+        
+        componentWillMount: function() {
+            this.setState({
+              price: this.props.transaction.price,
+              symbolSign: this.props.transaction.symbol
+            });
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            this.setState({
+              price: nextProps.transaction.price,
+              symbolSign: nextProps.transaction.symbol
+            });
         },
 
         render: function(){
@@ -53,7 +86,7 @@
                     <td>
                         <Combo symbols={this.props.symbols} changeSelect={this.changeSelect}/>
                     </td>
-                    <td>{this.props.transaction.symbol} {this.props.transaction.price}</td>
+                    <td>{this.state.symbolSign} {this.state.price}</td>
                 </tr>
             );
         }
