@@ -7,6 +7,14 @@ var app = express();
 var port = process.env.PORT || 3000;
 var router = express.Router();
 var oneDay = 86400000;
+var staticRateConverter = "getStaticConversionRates";
+var dynamicRateConverter = "getDynamicConversionRates";
+var currentRateConverter = dynamicRateConverter;
+
+//We should be calling Dynamic API after every 1 minute
+setTimeout(function(){
+    currentRateConverter = dynamicRateConverter;
+}, 60000);
 
 //Routes
 var activityRoute = router.route('/activity');
@@ -76,7 +84,8 @@ function getConversionRate(codeFrom, codeTo, cb){
         cb.call(this, false);
         return;
     }
-    currencyExchange.getDynamicConversionRates(function(rates){
+    console.log(currentRateConverter);
+    currencyExchange[currentRateConverter](function(rates){
         var from = _.find(rates, function(rate){
             return rate.symbol === codeFrom;
         });
@@ -87,7 +96,7 @@ function getConversionRate(codeFrom, codeTo, cb){
             cb.call(this, false);
             return;
         }
-        
+        currentRateConverter = staticRateConverter;
         cb.call(this, {from: from, to: to});
     });
 }
